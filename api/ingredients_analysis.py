@@ -196,7 +196,7 @@ async def analyze_harmful_ingredients(ingredient, assistant_id, client):
     return harmful_ingredient_analysis_str, is_ingredient_not_found_in_doc
 
 
-def get_assistant_for_ingredient(ingredient, N=2, client, embeddings_titles_list):
+def get_assistant_for_ingredient(ingredient, client, embeddings_titles_list, N=2):
   
     #Harmful Ingredients
     assistant2 = client.beta.assistants.create(
@@ -322,7 +322,7 @@ def get_ingredient_analysis(product_info_from_db):
   
             processing_level = analyze_processing_level(ingredients_list, assistant_p.id, client) if ingredients_list else ""
             for ingredient in ingredients_list:
-                assistant_id_ingredient, refs_ingredient = get_assistant_for_ingredient(ingredient, 2, client, embeddings_titles_list)
+                assistant_id_ingredient, refs_ingredient = get_assistant_for_ingredient(ingredient, client, embeddings_titles_list, 2)
                 ingredient_analysis, is_ingredient_in_doc = analyze_harmful_ingredients(ingredient, assistant_id_ingredient.id, client)
                 all_ingredient_analysis += ingredient_analysis + "\n"
                 if is_ingredient_in_doc:
