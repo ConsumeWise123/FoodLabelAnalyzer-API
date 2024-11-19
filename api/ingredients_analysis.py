@@ -344,7 +344,7 @@ def analyze_processing_level(ingredients, assistant_id, client):
     processing_level_str = message_content.value
     return processing_level_str
 
-@app.get("/api/processing_level-ingredient-analysis")
+@app.post("/api/processing_level-ingredient-analysis")
 def get_ingredient_analysis(product_info_from_db):
         
     if product_info_from_db:
