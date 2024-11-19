@@ -9,7 +9,6 @@ import json
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict, Any
-from openai import OpenAI
 from typing import Dict, Any
 
 # Set up logging with file name and line numbers
