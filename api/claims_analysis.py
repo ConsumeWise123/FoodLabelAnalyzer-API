@@ -11,7 +11,7 @@ import torch
 from pydantic import BaseModel
 from openai import OpenAI
 
-app = FastAPI(debug = True)
+app = FastAPI()
 
 def create_assistant(client):
     assistant3 = client.beta.assistants.create(
