@@ -7,7 +7,7 @@ import json
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict, Any
-from calc_cosine_similarity import find_relevant_file_paths
+from ..calc_cosine_similarity import find_relevant_file_paths
 
 app = FastAPI(debug = True)
 
