@@ -6,3 +6,4 @@ motor
 python-dotenv
 uvicorn
 logging
+sentence_transformers
