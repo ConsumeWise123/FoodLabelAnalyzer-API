@@ -373,4 +373,4 @@ def get_ingredient_analysis(product_info_from_db):
                 if is_ingredient_in_doc:
                     refs.extend(refs_ingredient)
 
-        return refs, all_ingredient_analysis, processing_level
+        return {'refs' : refs, 'all_ingredient_analysis' : all_ingredient_analysis, 'processing_level' : processing_level}
