@@ -1,6 +1,6 @@
 import logging
 import traceback
-import sys
+import sys, pickle
 from functools import wraps
 import os
 import json
