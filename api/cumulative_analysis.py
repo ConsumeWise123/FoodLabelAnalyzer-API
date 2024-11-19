@@ -1,4 +1,5 @@
 import streamlit as st
+from fastapi import FastAPI
 from openai import OpenAI
 import json, os, httpx, asyncio
 import requests, time
