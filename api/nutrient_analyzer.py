@@ -3,7 +3,7 @@ import traceback
 import sys
 from functools import wraps
 from .icmr import analyze_nutrients
-from .rda import find_nutrition, rda_analysis
+from .rda import find_nutrition, rda_analysis, analyze_nutrition_icmr_rda
 import os
 import json
 from fastapi import FastAPI, HTTPException
