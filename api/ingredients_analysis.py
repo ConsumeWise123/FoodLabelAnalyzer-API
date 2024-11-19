@@ -140,7 +140,7 @@ def get_files_with_ingredient_info(ingredient, embeddings_titles_list, N=1):
             
     return file_paths, refs
   
-async def analyze_harmful_ingredients(ingredient, assistant_id, client):
+def analyze_harmful_ingredients(ingredient, assistant_id, client):
     
     is_ingredient_not_found_in_doc = False
     
