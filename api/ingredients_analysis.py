@@ -7,9 +7,54 @@ import json
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict, Any
-from ..calc_cosine_similarity import find_relevant_file_paths
+from sentence_transformers import SentenceTransformer, util
+import torch
 
 app = FastAPI(debug = True)
+
+# Load the pre-trained model
+model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+
+def find_relevant_file_paths(ingredient, embeddings, titles, folder_name, journal_str = None, N=2, thres=0.7):
+    global model
+    file_paths = []
+    file_titles = []
+    refs = []
+
+    embedding_ingredient = model.encode(ingredient, convert_to_tensor=True)
+    cosine_sims_dict = {}
+    cosine_sims_title = {}
+  
+    title_num = 0
+    for embedding in embeddings:
+        # Compute cosine similarity
+        title_num += 1
+        cosine_sim = util.pytorch_cos_sim(embedding_ingredient, embedding)
+        cosine_sims_dict.update({title_num:cosine_sim})
+        cosine_sims_title.update({titles[title_num-1]:cosine_sim})
+
+    #Sort cosine_sims_dict based on value of cosine_sim
+    top_n_cosine_sims_dict = dict(sorted(cosine_sims_dict.items(), key=lambda item: item[1], reverse=True)[:N])
+    top_n_cosine_sims_title = dict(sorted(cosine_sims_title.items(), key=lambda item: item[1], reverse=True)[:N])
+
+    print(f"DEBUG : Ingredient {ingredient} top_n_cosine_sims_dict : {top_n_cosine_sims_dict} top_n_cosine_sims_title : {top_n_cosine_sims_title}")
+    
+    for key, value in top_n_cosine_sims_dict.items():
+        if value.item() > thres:
+            file_paths.append(f"{folder_name}/article{key}.txt")
+            file_titles.append(titles[key-1])
+            #Read lines after "References:" from {folder_name}/article{key}.txt
+            start = 0
+            for line in open(f"{folder_name}/article{key}.txt").readlines():
+              if line.strip() == "References:" and start == 0:
+                start = 1
+                continue
+              if start == 1:
+                if journal_str is not None and journal_str in line.strip():
+                  refs.append(line.strip())
+  
+    print(f"Returning citations : {list(set(sorted(refs)))}")    
+    return file_paths, file_titles, list(set(sorted(refs)))
 
 def create_assistant_and_embeddings(client, embeddings_file_list):
     assistant1 = client.beta.assistants.create(
