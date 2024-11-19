@@ -341,8 +341,7 @@ def analyze_processing_level(ingredients, assistant_id, client):
         #    cited_file = client.files.retrieve(file_citation.file_id)
         #    citations.append(f"[{index}] {cited_file.filename}")
 
-    if debug_mode:
-        print(message_content.value)
+    print(message_content.value)
     processing_level_str = message_content.value
     return processing_level_str
 
