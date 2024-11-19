@@ -57,7 +57,7 @@ def create_assistant_and_embeddings(client, embeddings_file_list):
 
     return assistant1, embeddings_titles_list
 
-def get_files_with_ingredient_info(ingredient, N=1, embeddings_titles_list):
+def get_files_with_ingredient_info(ingredient, embeddings_titles_list, N=1):
 
     embeddings_titles_1 = embeddings_titles_list[0]
     with open('titles.txt', 'r') as file:
@@ -221,7 +221,7 @@ def get_assistant_for_ingredient(ingredient, N=2, client, embeddings_titles_list
     )
 
     # Ready the files for upload to OpenAI.     
-    file_paths, refs = get_files_with_ingredient_info(ingredient, N, embeddings_titles_list)
+    file_paths, refs = get_files_with_ingredient_info(ingredient, embeddings_titles_list, N)
     #if file_paths[0] == "Ingredients.docx" and assistant_default_doc:
         #print(f"Using Ingredients.docx for analyzing ingredient {ingredient}")
     #    return assistant_default_doc, refs
