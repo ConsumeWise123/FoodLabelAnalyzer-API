@@ -2,7 +2,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
-from openai import OpenAI
+from openai import AsyncOpenAI
 import os
 import json
 import re
@@ -23,7 +23,7 @@ from .config import MONGODB_URL, OPENAI_API_KEY
 from .schemas import label_reader_schema
 
 # Initialize clients
-openai_client = OpenAI(api_key=OPENAI_API_KEY)
+openai_client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 mongodb_client = AsyncIOMotorClient(MONGODB_URL)
 db = mongodb_client.consumeWise
 collection = db.products
@@ -42,7 +42,6 @@ Your goal will be to extract information from these images to populate the schem
 """
     try:
         image_message = [{"type": "image_url", "image_url": {"url": il}} for il in image_links]
-        load_label_reader_prompt()
         response = await openai_client.chat.completions.create(
             model="gpt-4-vision-preview",
             messages=[
