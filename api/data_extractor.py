@@ -29,6 +29,9 @@ db = mongodb_client.consumeWise
 collection = db.products
 
 async def extract_information(image_links: List[str]) -> Dict[str, Any]:
+    global openai_client
+    print(f"DEBUG - openai_client : {openai_client}")
+    
     LABEL_READER_PROMPT = """
 You will be provided with a set of images corresponding to a single product. These images are found printed on the packaging of the product.
 Your goal will be to extract information from these images to populate the schema provided. Here is some information you will routinely encounter. Ensure that you capture complete information, especially for nutritional information and ingredients:
