@@ -6,7 +6,7 @@ from .data_extractor import app as data_extractor_app
 from .nutrient_analyzer import app as nutrient_analyzer_app
 from .ingredients_analysis import app as ingredients_analyzer_app
 from .claims_analysis import app as claims_analyzer_app
-from .cumulative_analysis import cumulative_analyzer_app
+from .cumulative_analysis import app as cumulative_analyzer_app
 
 main_app = FastAPI()
 
