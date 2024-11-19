@@ -1,11 +1,8 @@
-import streamlit as st
 from fastapi import FastAPI
 from openai import OpenAI
 import json, os, httpx, asyncio
-import requests, time
 from typing import Dict, Any
 import pickle
-import httpx
 from .calc_consumption_context import get_consumption_context
 
 app = FastAPI(debug=True)
