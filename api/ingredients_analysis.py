@@ -72,7 +72,7 @@ def create_assistant_and_embeddings(client, embeddings_file_list):
     vector_store1 = client.beta.vector_stores.create(name="Processing Level Vec")
     
     # Ready the files for upload to OpenAI
-    file_paths = ["Processing_Level.docx"]
+    file_paths = ["../docs/Processing_Level.docx"]
     file_streams = [open(path, "rb") for path in file_paths]
     
     # Use the upload and poll SDK helper to upload the files, add them to the vector store,
@@ -107,20 +107,20 @@ def create_assistant_and_embeddings(client, embeddings_file_list):
 def get_files_with_ingredient_info(ingredient, embeddings_titles_list, N=1):
 
     embeddings_titles_1 = embeddings_titles_list[0]
-    with open('titles.txt', 'r') as file:
+    with open('../docs/titles.txt', 'r') as file:
         lines = file.readlines()
     
     titles = [line.strip() for line in lines]
-    folder_name_1 = "articles"
+    folder_name_1 = "../docs/articles"
     #Apply cosine similarity between embedding of ingredient name and title of all files
     file_paths_abs_1, file_titles_1, refs_1 = find_relevant_file_paths(ingredient, embeddings_titles_1, titles, folder_name_1, journal_str = ".ncbi.", N=N)
 
     embeddings_titles_2 = embeddings_titles_list[1]
-    with open('titles_harvard.txt', 'r') as file:
+    with open('../docs/titles_harvard.txt', 'r') as file:
         lines = file.readlines()
     
     titles = [line.strip() for line in lines]
-    folder_name_2 = "articles_harvard"
+    folder_name_2 = "../docs/articles_harvard"
     #Apply cosine similarity between embedding of ingredient name and title of all files
     file_paths_abs_2, file_titles_2, refs_2 = find_relevant_file_paths(ingredient, embeddings_titles_2, titles, folder_name_1, N=N)
 
@@ -129,7 +129,7 @@ def get_files_with_ingredient_info(ingredient, embeddings_titles_list, N=1):
     file_paths = []
     refs = []
     if len(file_paths_abs_1) == 0 and len(file_paths_abs_2) == 0:
-        file_paths.append("Ingredients.docx")
+        file_paths.append("../docs/Ingredients.docx")
     else:
         for file_path in file_paths_abs_1:
             file_paths.append(file_path)
