@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict, Any
 from sentence_transformers import SentenceTransformer, util
 import torch
+from pydantic import BaseModel
 
 app = FastAPI(debug = True)
 
@@ -344,8 +345,13 @@ def analyze_processing_level(ingredients, assistant_id, client):
     processing_level_str = message_content.value
     return processing_level_str
 
+# Define the request body using a simple BaseModel (without complex pydantic models if not needed)
+class IngredientAnalysisRequest(BaseModel):
+    product_info_from_db: dict
+    
 @app.post("/api/processing_level-ingredient-analysis")
-def get_ingredient_analysis(product_info_from_db):
+def get_ingredient_analysis(request: IngredientAnalysisRequest):
+    product_info_from_db = request.product_info_from_db
         
     if product_info_from_db:
         brand_name = product_info_from_db.get("brandName", "")
