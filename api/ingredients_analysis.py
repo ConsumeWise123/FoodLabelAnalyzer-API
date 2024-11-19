@@ -10,6 +10,7 @@ from typing import List, Dict, Any
 from sentence_transformers import SentenceTransformer, util
 import torch
 from pydantic import BaseModel
+from openai import OpenAI
 
 app = FastAPI(debug = True)
 
