@@ -46,7 +46,7 @@ Your goal will be to extract information from these images to populate the schem
     try:
         image_message = [{"type": "image_url", "image_url": {"url": il}} for il in image_links]
         response = await openai_client.chat.completions.create(
-            model="gpt-4-vision-preview",
+            model="gpt-4o",
             messages=[
                 {
                     "role": "user",
