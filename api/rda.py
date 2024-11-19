@@ -172,3 +172,47 @@ async def rda_analysis(product_info_from_db_nutritionalInformation: Dict[str, An
         # Log the error and raise it for proper handling
         print(f"Error in RDA analysis: {str(e)}")
         raise
+
+async def analyze_nutrition_icmr_rda(nutrient_analysis, nutrient_analysis_rda):
+    global client
+    system_prompt = """
+Task: Analyze the nutritional content of the food item and compare it to the Recommended Daily Allowance (RDA) or threshold limits defined by ICMR. Provide practical, contextual insights based on the following nutrients:
+
+Nutrient Breakdown and Analysis:
+Calories:
+
+Compare the calorie content to a well-balanced meal.
+Calculate how many meals' worth of calories the product contains, providing context for balanced eating.
+Sugar & Salt:
+
+Convert the amounts of sugar and salt into teaspoons to help users easily understand their daily intake.
+Explain whether the levels exceed the ICMR-defined limits and what that means for overall health.
+Fat & Calories:
+
+Analyze fat content, specifying whether it is high or low in relation to a balanced diet.
+Offer insights on how the fat and calorie levels may impact the user’s overall diet, including potential risks or benefits.
+Contextual Insights:
+For each nutrient, explain how its levels (whether high or low) affect health and diet balance.
+Provide actionable recommendations for the user, suggesting healthier alternatives or adjustments to consumption if necessary.
+Tailor the advice to the user's lifestyle, such as recommending lower intake if sedentary or suggesting other dietary considerations based on the product's composition.
+
+Output Structure:
+For each nutrient (Calories, Sugar, Salt, Fat), specify if the levels exceed or are below the RDA or ICMR threshold.
+Provide clear, concise comparisons (e.g., sugar exceeds the RDA by 20%, equivalent to X teaspoons).    
+    """
+
+    user_prompt = f"""
+Nutrition Analysis :
+{nutrient_analysis}
+{nutrient_analysis_rda}
+"""
+        
+    completion = await client.chat.completions.create(
+        model="gpt-4o",  # Make sure to use an appropriate model
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ]
+    )
+
+    return completion.choices[0].message.content
