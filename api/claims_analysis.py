@@ -146,4 +146,4 @@ def get_claims_analysis(request: ClaimsAnalysisRequest):
             #Create embeddings
             claims_analysis = analyze_claims(claims_list, ingredients_list, assistant_c.id, client) if claims_list else ""
 
-        return {'claims' : claims_analysis}
+        return {'claims_analysis' : claims_analysis}
