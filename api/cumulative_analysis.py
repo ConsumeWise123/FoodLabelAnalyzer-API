@@ -85,7 +85,9 @@ Claims Analysis for the product is as follows ->
     )
 
     base_response = f"Brand: {brand_name}\n\nProduct: {product_name}\n\nAnalysis:\n\n{completion.choices[0].message.content}"
-    
+    print(f"raw refs_list is {refs}")  # Parse the JSON string back into a list
+    print(f"parsed refs_list is {json.loads(refs)}")  # Parse the JSON string back into a list
+
     if refs:  # This checks if refs is not empty
         try:
             refs_list = json.loads(refs)  # Parse the JSON string back into a list
