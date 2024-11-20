@@ -85,13 +85,12 @@ Claims Analysis for the product is as follows ->
     )
 
     base_response = f"Brand: {brand_name}\n\nProduct: {product_name}\n\nAnalysis:\n\n{completion.choices[0].message.content}"
-    print(f"raw refs_list is {refs}")  # Parse the JSON string back into a list
-    print(f"parsed refs_list is {refs.split(",")}")  # Parse the JSON string back into a list
+    print(f"DEBUG raw refs is {refs}")  # Parse the JSON string back into a list
+    refs_list = refs.split(",")
+    print(f"DEBUG refs_list is {refs_list}")
 
     if refs:  # This checks if refs is not empty
         try:
-            refs_list = refs.split(",")  # Parse the JSON string back into a list
-            print(f"DEBUG Refs_list is {refs_list}")
             if len(refs_list) > 0:
                 L = min(2, len(refs_list))
                 refs_str = '\n'.join(refs_list[0:L])
