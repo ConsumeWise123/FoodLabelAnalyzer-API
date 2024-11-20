@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from openai import OpenAI
 import json, os, httpx, asyncio
 from typing import Dict, Any
-import pickle
 from .calc_consumption_context import get_consumption_context
 
 app = FastAPI(debug=True)
