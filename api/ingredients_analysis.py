@@ -1,4 +1,3 @@
-import logging
 import traceback
 import sys, pickle
 from functools import wraps
@@ -12,7 +11,7 @@ import torch
 from pydantic import BaseModel
 from openai import OpenAI
 
-app = FastAPI(debug = True)
+app = FastAPI()
 
 # Load the pre-trained model
 model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
