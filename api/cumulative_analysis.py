@@ -9,7 +9,7 @@ app = FastAPI(debug=True)
 
 @app.get("/api/cumulative-analysis")
 def generate_final_analysis(brand_name, product_name, nutritional_level, processing_level, all_ingredient_analysis, claims_analysis, refs):
-    client = OpenAI(os.getenv("OPENAI_API_KEY"))
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
   
     consumption_context = get_consumption_context(f"{product_name} by {brand_name}", client)
     
