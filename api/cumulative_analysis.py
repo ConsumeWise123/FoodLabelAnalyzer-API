@@ -84,9 +84,22 @@ Claims Analysis for the product is as follows ->
         ]
     )
 
-    if len(refs) > 0:
-        L = min(2, len(refs))
-        refs_str = '\n'.join(refs[0:L])
-        return f"Brand: {brand_name}\n\nProduct: {product_name}\n\nAnalysis:\n\n{completion.choices[0].message.content}\n\nTop Citations:\n\n{refs_str}"
+    # When receiving the refs parameter
+    if refs:
+        try:
+            refs_list = json.loads(refs)  # Parse the JSON string back into a list
+            if len(refs_list) > 0:
+                L = min(2, len(refs_list))
+                refs_str = '\n'.join(refs_list[0:L])
+                return f"Brand: {brand_name}\n\nProduct: {product_name}\n\nAnalysis:\n\n{completion.choices[0].message.content}\n\nTop Citations:\n\n{refs_str}"
+        except json.JSONDecodeError:
+        # Handle parsing error
+        pass
     else:
         return f"Brand: {brand_name}\n\nProduct: {product_name}\n\nAnalysis:\n\n{completion.choices[0].message.content}"
+    #if len(refs) > 0:
+    #    L = min(2, len(refs))
+    #    refs_str = '\n'.join(refs[0:L])
+    #    return f"Brand: {brand_name}\n\nProduct: {product_name}\n\nAnalysis:\n\n{completion.choices[0].message.content}\n\nTop Citations:\n\n{refs_str}"
+    #else:
+    #    return f"Brand: {brand_name}\n\nProduct: {product_name}\n\nAnalysis:\n\n{completion.choices[0].message.content}"
