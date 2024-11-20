@@ -4,7 +4,7 @@ import json, os, httpx, asyncio
 from typing import Dict, Any
 from .calc_consumption_context import get_consumption_context
 
-app = FastAPI(debug=True)
+app = FastAPI()
 
 @app.get("/api/cumulative-analysis")
 def generate_final_analysis(brand_name, product_name, nutritional_level, processing_level, all_ingredient_analysis, claims_analysis, refs):
