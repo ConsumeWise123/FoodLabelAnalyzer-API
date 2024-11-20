@@ -84,19 +84,21 @@ Claims Analysis for the product is as follows ->
         ]
     )
 
-    # When receiving the refs parameter
-    if refs:
+    base_response = f"Brand: {brand_name}\n\nProduct: {product_name}\n\nAnalysis:\n\n{completion.choices[0].message.content}"
+    
+    if refs:  # This checks if refs is not empty
         try:
             refs_list = json.loads(refs)  # Parse the JSON string back into a list
             if len(refs_list) > 0:
                 L = min(2, len(refs_list))
                 refs_str = '\n'.join(refs_list[0:L])
-                return f"Brand: {brand_name}\n\nProduct: {product_name}\n\nAnalysis:\n\n{completion.choices[0].message.content}\n\nTop Citations:\n\n{refs_str}"
-        except json.JSONDecodeError:
-        # Handle parsing error
-        pass
-    else:
-        return f"Brand: {brand_name}\n\nProduct: {product_name}\n\nAnalysis:\n\n{completion.choices[0].message.content}"
+                return f"{base_response}\n\nTop Citations:\n\n{refs_str}"
+            return base_response  # Need this for empty refs_list
+        except json.JSONDecodeError as e:
+            print(f"Error while decoding json : {e}")
+            return base_response  # Need this for JSON decode errors
+    
+    return base_response  # For empty refs string
     #if len(refs) > 0:
     #    L = min(2, len(refs))
     #    refs_str = '\n'.join(refs[0:L])
