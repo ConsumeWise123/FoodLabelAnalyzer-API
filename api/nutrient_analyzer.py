@@ -1,4 +1,3 @@
-import logging
 import traceback
 import sys
 from functools import wraps
@@ -10,15 +9,6 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict, Any
 from typing import Dict, Any
-
-# Set up logging with file name and line numbers
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s'
-)
-logger = logging.getLogger(__name__)
-
-#logging.getLogger('pymongo').setLevel(logging.WARNING)
 
 # Create an error handling decorator
 def log_exceptions(func):
