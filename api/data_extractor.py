@@ -5,7 +5,7 @@ from openai import AsyncOpenAI
 import os
 import json
 import re
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 app = FastAPI()
 
@@ -105,16 +105,27 @@ async def find_product(product_name: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/get-product")
-async def get_product(product_name: str):
-    if not product_name:
-        raise HTTPException(status_code=400, detail="Please provide a valid product name")
-    
+async def get_product(products: str, ind: int):
     try:
+        # Convert comma-separated string to list
+        product_list = [p.strip() for p in products.split(',')]
+
+        if not product_list:
+            raise HTTPException(status_code=400, detail="Please provide a valid product list")
+
+        if ind < 0 or ind >= len(product_list):
+            raise HTTPException(status_code=400, detail=f"Index {ind} is out of range for product list of length {len(product_list)}")
+
+        product_name = product_list[ind]
+        if not product_name:
+            raise HTTPException(status_code=400, detail="Product name at given index is empty")
+
         product = await collection.find_one({"productName": product_name})
         if not product:
-            raise HTTPException(status_code=404, detail="Product not found")
-        
+            raise HTTPException(status_code=404, detail=f"Product not found: {product_name}")
+
         product["_id"] = str(product["_id"])
         return product
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
