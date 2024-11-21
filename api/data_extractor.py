@@ -92,12 +92,12 @@ async def find_product(product_name: str):
                 
         if len(product_list) > 0:
             return {
-                "products": "\n".join(product_list),
+                "products": "\n".join(list(set(product_list))),
                 "message": "Products found"
             }
         else:
             return {
-                "products": "\n".join(product_list),
+                "products": "",
                 "message": "No products found"
             }
             
