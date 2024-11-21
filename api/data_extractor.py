@@ -112,12 +112,12 @@ async def find_product(product_name: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 class ProductRequest(BaseModel):
-    products: str
+    product_list: str
     ind: int
     
 @app.post("/api/get-product")
 async def get_product(request: ProductRequest):
-    if len(request.products.split("\n")) == 0:
+    if len(request.product_list.split("\n")) == 0:
         raise HTTPException(status_code=400, detail="Please provide a valid product list")
     
     if request.ind < 1 or request.ind > len(request.product_list.split("\n")):
