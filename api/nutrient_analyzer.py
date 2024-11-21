@@ -82,9 +82,9 @@ async def get_nutrient_analysis(request: NutrientAnalysisRequest):
     product_info = request.product_info_from_db
     try:
         if ("nutritionalInformation" not in product_info or "servingSize" not in product_info or "quantity" not in product_info["servingSize"]):
-            return ""
+            return {"nutrition_analysis" : ""}
         if (len(product_info["nutritionalInformation"]) == 0 or product_info["servingSize"]["quantity"] == 0):
-            return ""
+            return {"nutrition_analysis" : ""}
             
         nutritional_information = product_info["nutritionalInformation"]
         
