@@ -117,11 +117,13 @@ class ProductRequest(BaseModel):
     
 @app.post("/api/get-product")
 async def get_product(request: ProductRequest):
-    if len(request.product_list.split("\n")) == 0:
+    product_lines = request.product_list.split('\n')  # Store split result to avoid repetition
+
+    if len(product_lines) == 0:
         raise HTTPException(status_code=400, detail="Please provide a valid product list")
     
-    if request.ind < 1 or request.ind > len(request.product_list.split("\n")) - 1:
-        raise HTTPException(status_code=400, detail=f"Index {request.ind} is out of range for product list of length {len(request.product_list.split("\n"))}")
+    if request.ind - 1 < 0 or request.ind - 1 >= len(product_lines) - 1:
+        raise HTTPException(status_code=400, detail=f"Index {request.ind - 1} is out of range for product list of length {len(product_lines) - 1}")
     
     try:
         product_name = request.product_list.split("\n")[request.ind - 1].split(".")[1].strip()
