@@ -95,7 +95,7 @@ async def find_product(product_name: str):
                     product_list.append(brand_product_name)
                     temp_list.append(f"{product['productName']} by {product['brandName']}")
 
-        product_list.append(f"{len(product_list) + 1}. None of the above")
+        product_list.append("\ntype None")
         
         if len(product_list) > 1:
             return {
