@@ -81,7 +81,7 @@ async def find_product(product_name: str):
     
     try:
         words = product_name.split()
-        search_terms = [' '.join(words[:i]) for i in range(2, len(words) + 1)]
+        search_terms = [' '.join(words[:i]) for i in range(2, len(words) + 1)] + words
         product_list = []
         
         for term in search_terms:
@@ -89,11 +89,18 @@ async def find_product(product_name: str):
             async for product in collection.find(query):
                 brand_product_name = f"{len(product_list) + 1}. {product['productName']} by {product['brandName']}"
                 product_list.append(brand_product_name)
-        
-        return {
-            "products": "\n".join(product_list),
-            "message": "Products found" if product_list else "No products found"
-        }
+                
+        if len(product_list) > 0:
+            return {
+                "products": "\n".join(product_list),
+                "message": "Products found"
+            }
+        else:
+            return {
+                "products": "\n".join(product_list),
+                "message": "No products found"
+            }
+            
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
