@@ -299,6 +299,50 @@ def get_assistant_for_ingredient(ingredient, client, embeddings_titles_list, def
         
     return assistant2, refs, file_paths
 
+def create_default_assistant():
+
+    assistant2 = client.beta.assistants.create(
+      name="Harmful Ingredients",
+      instructions=f"You are an expert dietician. Use your knowledge base to answer questions about the ingredient {ingredient} in a food product.",
+      model="gpt-4o",
+      tools=[{"type": "file_search"}],
+      temperature=0,
+      top_p = 0.85
+      )
+
+    # Create a vector store
+    vector_store2 = client.beta.vector_stores.create(
+     name="Harmful Ingredients Vec",
+     chunking_strategy={
+        "type": "static",
+        "static": {
+            "max_chunk_size_tokens": 400,  # Set your desired max chunk size
+            "chunk_overlap_tokens": 200    # Set your desired overlap size
+        }
+    }
+    )
+
+    
+    file_streams = open("docs/Ingredients.docx", "rb")
+    
+    # Use the upload and poll SDK helper to upload the files, add them to the vector store,
+    # and poll the status of the file batch for completion.
+    file_batch2 = client.beta.vector_stores.file_batches.upload_and_poll(
+      vector_store_id=vector_store2.id, files=file_streams
+    )
+    
+    # You can print the status and the file counts of the batch to see the result of this operation.
+    print(file_batch2.status)
+    print(file_batch2.file_counts)
+
+    #harmful Ingredients
+    assistant2 = client.beta.assistants.update(
+      assistant_id=assistant2.id,
+      tool_resources={"file_search": {"vector_store_ids": [vector_store2.id]}},
+    )
+
+    return assistant2
+    
 def analyze_processing_level(ingredients, assistant_id, client):
     
     thread = client.beta.threads.create(
@@ -382,6 +426,10 @@ def get_ingredient_analysis(request: IngredientAnalysisRequest):
                     if default_assistant is None:
                         default_assistant = assistant_id_ingredient
                     continue
+
+                if default_assistant is None:
+                    default_assistant = create_default_assistant()
+                    
                 ingredient_analysis, is_ingredient_in_doc = analyze_harmful_ingredients(ingredient_list = [], ingredient = ingredient, assistant_id = assistant_id_ingredient.id, client = client)
                 all_ingredient_analysis += ingredient_analysis + "\n"
                 if is_ingredient_in_doc:
