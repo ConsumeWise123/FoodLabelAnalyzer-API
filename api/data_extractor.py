@@ -62,12 +62,12 @@ Your goal will be to extract information from these images to populate the schem
         raise HTTPException(status_code=500, detail=f"Error extracting information: {str(e)}")
 
 @app.post("/api/extract-data")
-async def extract_data(image_links: List[str]):
+async def extract_data(image_links_json):
     if not image_links:
         raise HTTPException(status_code=400, detail="Image links not found")
     
     try:
-        extracted_data = await extract_information(image_links)
+        extracted_data = await extract_information(image_links_json["image_links"])
         result = await collection.insert_one(extracted_data)
         extracted_data["_id"] = str(result.inserted_id)
         return extracted_data
