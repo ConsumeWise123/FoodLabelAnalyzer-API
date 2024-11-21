@@ -121,7 +121,7 @@ async def get_product(request: ProductRequest):
         raise HTTPException(status_code=400, detail="Please provide a valid product list")
     
     if request.ind < 1 or request.ind > len(request.product_list.split("\n")) - 1:
-        raise HTTPException(status_code=400, detail=f"Index {request.ind} is out of range for product list of length {len(request.product_list)}")
+        raise HTTPException(status_code=400, detail=f"Index {request.ind} is out of range for product list of length {len(request.product_list.split("\n"))}")
     
     try:
         product_name = request.product_list.split("\n")[request.ind].split(".")[1].strip()
