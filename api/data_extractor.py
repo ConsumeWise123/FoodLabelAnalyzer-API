@@ -84,16 +84,20 @@ async def find_product(product_name: str):
         words = product_name.split()
         search_terms = [' '.join(words[:i]) for i in range(2, len(words) + 1)] + words
         product_list = []
+        temp_list = []
         
         for term in search_terms:
             query = {"productName": {"$regex": f".*{re.escape(term)}.*", "$options": "i"}}
             async for product in collection.find(query):
                 brand_product_name = f"{len(product_list) + 1}. {product['productName']} by {product['brandName']}"
-                product_list.append(brand_product_name)
+                
+                if f"{product['productName']} by {product['brandName']}" not in temp_list:
+                    product_list.append(brand_product_name)
+                    temp_list.append(f"{product['productName']} by {product['brandName']}")
                 
         if len(product_list) > 0:
             return {
-                "products": "\n".join(list(set(product_list))),
+                "products": "\n".join(product_list),
                 "message": "Products found"
             }
         else:
