@@ -237,7 +237,7 @@ def analyze_harmful_ingredients(ingredient_list = [], ingredient = "", assistant
         if value.startswith("(NOT FOUND IN DOCUMENT)"):
             ingredients_not_found_in_doc.append(key)
             is_ingredient_not_found_in_doc = True
-        print(f"Ingredients not found in database {','.join(ingredients_not_found_in_doc)}")
+    print(f"Ingredients not found in database {','.join(ingredients_not_found_in_doc)}")
     
     harmful_ingredient_analysis = json.loads(message_content.value.replace("```", "").replace("json", "").replace("(NOT FOUND IN DOCUMENT) ", ""))
         
