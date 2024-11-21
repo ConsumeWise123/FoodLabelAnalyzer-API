@@ -3,13 +3,34 @@ from openai import OpenAI
 import json, os, httpx, asyncio
 from typing import Dict, Any
 from .calc_consumption_context import get_consumption_context
+from pydantic import BaseModel
 
 app = FastAPI()
 
-@app.get("/api/cumulative-analysis")
-def generate_final_analysis(brand_name, product_name, nutritional_level, processing_level, all_ingredient_analysis, claims_analysis, refs):
+class ProductRequest(BaseModel):
+    brand_name: str
+    product_name: str
+    nutritional_level: str
+    processing_level: str
+    all_ingredient_analysis: str
+    claims_analysis: str
+    refs: list[str]
+    
+@app.post("/api/cumulative-analysis")
+def generate_final_analysis(request: ProductRequest):
+    if not request.brand_name or not request.product_name:
+        raise HTTPException(status_code=400, detail="Please provide a valid product list")
+    
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-  
+    
+    brand_name = request.brand_name
+    product_name = request.product_name
+    nutritional_level = request.nutritional_level
+    processing_level = request.processing_level
+    all_ingredient_analysis = request.all_ingredient_analysis
+    claims_analysis = request.claims_analysis
+    refs = request.refs
+    
     consumption_context = get_consumption_context(f"{product_name} by {brand_name}", client)
     
     system_prompt = """Tell the consumer whether the product is a healthy option at the assumed functionality along with the reasoning behind why it is a good option or not. Refer to Consumption Context as a guide for generating a recommendation. 
@@ -86,7 +107,7 @@ Claims Analysis for the product is as follows ->
 
     base_response = f"Brand: {brand_name}\n\nProduct: {product_name}\n\nAnalysis:\n\n{completion.choices[0].message.content}"
     print(f"DEBUG raw refs is {refs}")  # Parse the JSON string back into a list
-    refs_list = refs.split(",")
+    refs_list = refs
     print(f"DEBUG refs_list is {refs_list}")
 
     if refs:  # This checks if refs is not empty
