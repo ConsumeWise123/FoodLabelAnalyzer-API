@@ -116,7 +116,7 @@ async def get_nutrient_analysis(product_info: Dict[str, Any]):
                     
             try:
                 nutritional_level = await analyze_nutrition_icmr_rda(nutrient_analysis, nutrient_analysis_rda)
-                return nutritional_level
+                return {"nutrition_analysis" : nutritional_level}
             except Exception as e:
                 raise
                 
