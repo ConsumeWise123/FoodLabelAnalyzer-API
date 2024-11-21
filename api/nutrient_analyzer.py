@@ -5,6 +5,7 @@ import os
 import json
 from fastapi import FastAPI, HTTPException
 from typing import List, Dict, Any
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -71,9 +72,14 @@ def find_product_nutrients(product_info_from_db):
     return product_type, calories, sugar, salt, serving_size
     
 
+# Define the request body using a simple BaseModel (without complex pydantic models if not needed)
+class NutrientAnalysisRequest(BaseModel):
+    product_info_from_db: dict
+    
 # Apply the decorator to your endpoint
 @app.post("/api/nutrient-analysis")
-async def get_nutrient_analysis(product_info: Dict[str, Any]):
+async def get_nutrient_analysis(request: NutrientAnalysisRequest):
+    product_info = request.product_info_from_db
     try:
         if ("nutritionalInformation" not in product_info or "servingSize" not in product_info or "quantity" not in product_info["servingSize"]):
             return ""
