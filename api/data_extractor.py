@@ -94,8 +94,10 @@ async def find_product(product_name: str):
                 if f"{product['productName']} by {product['brandName']}" not in temp_list:
                     product_list.append(brand_product_name)
                     temp_list.append(f"{product['productName']} by {product['brandName']}")
-                
-        if len(product_list) > 0:
+
+        product_list.append("None of the above")
+        
+        if len(product_list) > 1:
             return {
                 "products": "\n".join(product_list),
                 "message": "Products found"
