@@ -110,19 +110,19 @@ async def find_product(product_name: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 class ProductRequest(BaseModel):
-    product_list: list[str]
+    products: str
     ind: int
     
 @app.post("/api/get-product")
 async def get_product(request: ProductRequest):
-    if not request.product_list:
+    if len(request.products.split("\n")) == 0:
         raise HTTPException(status_code=400, detail="Please provide a valid product list")
     
-    if request.ind < 1 or request.ind > len(request.product_list):
+    if request.ind < 1 or request.ind > len(request.product_list.split("\n")):
         raise HTTPException(status_code=400, detail=f"Index {request.ind} is out of range for product list of length {len(request.product_list)}")
     
     try:
-        product_name = request.product_list[request.ind].split(".")[1].strip()
+        product_name = request.product_list.split("\n")[request.ind].split(".")[1].strip()
         if not product_name:
             raise HTTPException(status_code=400, detail="Product name at given index is empty")
         
