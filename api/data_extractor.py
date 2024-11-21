@@ -62,8 +62,8 @@ Your goal will be to extract information from these images to populate the schem
         raise HTTPException(status_code=500, detail=f"Error extracting information: {str(e)}")
 
 @app.post("/api/extract-data")
-async def extract_data(image_links_json):
-    if not image_links:
+async def extract_data(image_links_json: Dict[str, List[str]]):
+    if not image_links_json or "image_links" not in image_links_json:
         raise HTTPException(status_code=400, detail="Image links not found")
     
     try:
