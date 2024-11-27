@@ -126,7 +126,7 @@ async def get_product(request: ProductRequest):
         raise HTTPException(status_code=400, detail=f"Index {request.ind - 1} is out of range for product list of length {len(product_lines) - 1}")
     
     try:
-        product_name = request.product_list.split("\n")[request.ind - 1].split(".")[1].strip()
+        product_name = request.product_list.split("\n")[request.ind - 1].split(".")[1].strip().split(" by ")[0]
         if not product_name:
             raise HTTPException(status_code=400, detail="Product name at given index is empty")
         
