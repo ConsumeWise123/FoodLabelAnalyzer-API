@@ -81,6 +81,7 @@ class NutrientAnalysisRequest(BaseModel):
 async def get_nutrient_analysis(request: NutrientAnalysisRequest):
     # Explicit type checking
     if not isinstance(request.product_info_from_db, dict):
+        print(f"product_info_from_db must be a dictionary -  {request.product_info_from_db}")
         raise HTTPException(status_code=400, detail="product_info_from_db must be a dictionary")
         
     product_info = request.product_info_from_db
@@ -122,6 +123,7 @@ async def get_nutrient_analysis(request: NutrientAnalysisRequest):
             try:
                 nutrient_analysis_rda = await find_nutrition(nutrient_analysis_rda_data)
             except TimeoutError as e:
+                print(f"Timeout during RDA analysis -  {str(e)}")
                 raise HTTPException(status_code=408, detail=f"Timeout during RDA analysis -  {str(e)}")
             except ValueError as e:
                raise HTTPException(status_code=400, detail=f"Bad request: {str(e)}")
@@ -139,6 +141,7 @@ async def get_nutrient_analysis(request: NutrientAnalysisRequest):
             raise HTTPException(status_code=400, detail=error_msg)
 
     except TimeoutError as e:
+        print(f"Timeout during Nutrition analysis -  {str(e)}")
         raise HTTPException(status_code=408, detail=f"Timeout during Nutrition analysis -  {str(e)}")
                     
     except HTTPException as http_ex:
