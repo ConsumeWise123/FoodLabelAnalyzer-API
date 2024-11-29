@@ -117,8 +117,12 @@ async def get_nutrient_analysis(request: NutrientAnalysisRequest):
 
             try:
                 nutrient_analysis_rda = await find_nutrition(nutrient_analysis_rda_data)
+            except TimeoutError as e:
+                raise HTTPException(status_code=408, detail=f"Timeout during RDA analysis -  {str(e)}")
+            except ValueError as e:
+               raise HTTPException(status_code=400, detail=f"Bad request: {str(e)}")
             except Exception as e:
-                raise
+                raise HTTPException(status_code=500, detail="Error during RDA analysis")
                     
             try:
                 nutritional_level = await analyze_nutrition_icmr_rda(nutrient_analysis, nutrient_analysis_rda)
