@@ -79,6 +79,10 @@ class NutrientAnalysisRequest(BaseModel):
 # Apply the decorator to your endpoint
 @app.post("/api/nutrient-analysis")
 async def get_nutrient_analysis(request: NutrientAnalysisRequest):
+    # Explicit type checking
+    if not isinstance(request.product_info_from_db, dict):
+        raise HTTPException(status_code=400, detail="product_info_from_db must be a dictionary")
+        
     product_info = request.product_info_from_db
     try:
         if ("nutritionalInformation" not in product_info or "servingSize" not in product_info or "quantity" not in product_info["servingSize"]):
@@ -134,6 +138,9 @@ async def get_nutrient_analysis(request: NutrientAnalysisRequest):
             error_msg = "Nutritional information is required"
             raise HTTPException(status_code=400, detail=error_msg)
 
+    except TimeoutError as e:
+        raise HTTPException(status_code=408, detail=f"Timeout during Nutrition analysis -  {str(e)}")
+                    
     except HTTPException as http_ex:
         raise http_ex
         
