@@ -114,6 +114,8 @@ async def extract_information(image_links: List[str], blur_threshold: float = 10
         if bool(quality_result['can_ocr']):
             #image is readable
             valid_image_links.append(single_image_link)
+        else:
+            return {}
         
     LABEL_READER_PROMPT = """
 You will be provided with a set of images corresponding to a single product. These images are found printed on the packaging of the product.
@@ -153,8 +155,10 @@ async def extract_data(image_links_json: Dict[str, List[str]]):
     
     try:
         extracted_data = await extract_information(image_links_json["image_links"])
-        result = await collection.insert_one(extracted_data)
-        extracted_data["_id"] = str(result.inserted_id)
+        if extracted_data:
+            result = await collection.insert_one(extracted_data)
+            extracted_data["_id"] = str(result.inserted_id)
+        
         return extracted_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
