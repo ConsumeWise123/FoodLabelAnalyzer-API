@@ -1,6 +1,9 @@
 # Use an official Python base image
 FROM python:3.9-slim
 
+# Can Use an optimized FastAPI base image
+#FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9
+
 # Set working directory
 WORKDIR /app
 
@@ -20,3 +23,9 @@ EXPOSE 8000
 
 # Command to run the application
 CMD ["python", "main.py"]
+
+# Expose the port your API will run on (default for uvicorn)
+#EXPOSE 80
+
+# Command to run the application with Uvicorn
+#CMD ["uvicorn", "api.main:main_app", "--host", "0.0.0.0", "--port", "80"]
