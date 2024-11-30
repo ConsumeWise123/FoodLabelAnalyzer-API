@@ -241,7 +241,7 @@ async def upload_multiple_images(files: List[UploadFile] = File(...)):
         with NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
             temp_file.write(file.file.read())
             temp_path = temp_file.name
-         quality_result = check_image_quality(temp_path, blur_threshold)
+        quality_result = check_image_quality(temp_path, blur_threshold)
 
         file_extension = os.path.splitext(file.filename)[1]
         unique_filename = f"{str(uuid.uuid4())}{file_extension}"
