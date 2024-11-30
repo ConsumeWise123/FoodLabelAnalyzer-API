@@ -58,40 +58,6 @@ def upload_to_s3(file_obj, filename: str) -> str:
     except ClientError as e:
         print(f"Error uploading to S3: {e}")
         return None
-        
-async def extract_information(image_links: List[str]) -> Dict[str, Any]:
-    global openai_client
-    print(f"DEBUG - openai_client : {openai_client}")
-    
-    LABEL_READER_PROMPT = """
-You will be provided with a set of images corresponding to a single product. These images are found printed on the packaging of the product.
-Your goal will be to extract information from these images to populate the schema provided. Here is some information you will routinely encounter. Ensure that you capture complete information, especially for nutritional information and ingredients:
-- Ingredients: List of ingredients in the item. They may have some percent listed in brackets. They may also have metadata or classification like Preservative (INS 211) where INS 211 forms the metadata. Structure accordingly. If ingredients have subingredients like sugar: added sugar, trans sugar, treat them as different ingredients.
-- Claims: Like a mango fruit juice says contains fruit.
-- Nutritional Information: This will have nutrients, serving size, and nutrients listed per serving. Extract the base value for reference.
-- FSSAI License number: Extract the license number. There might be many, so store relevant ones.
-- Name: Extract the name of the product.
-- Brand/Manufactured By: Extract the parent company of this product.
-- Serving size: This might be explicitly stated or inferred from the nutrients per serving.
-"""
-    try:
-        image_message = [{"type": "image_url", "image_url": {"url": il}} for il in image_links]
-        response = await openai_client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": LABEL_READER_PROMPT},
-                        *image_message,
-                    ],
-                },
-            ],
-            response_format={"type": "json_schema", "json_schema": label_reader_schema}
-        )
-        return json.loads(response.choices[0].message.content)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error extracting information: {str(e)}")
 
 def check_image_quality(image_path, blur_threshold=100):
     """
@@ -136,6 +102,49 @@ def check_image_quality(image_path, blur_threshold=100):
         'is_blurry': is_blurry,
         'can_ocr': bool(can_ocr),
     }
+    
+async def extract_information(image_links: List[str], blur_threshold: float = 100) -> Dict[str, Any]:
+    global openai_client
+    print(f"DEBUG - openai_client : {openai_client}")
+
+    valid_image_links = []
+    
+    for single_image_link in image_links:
+        quality_result = check_image_quality(single_image_link, blur_threshold)
+        if bool(quality_result['can_ocr']):
+            #image is readable
+            valid_image_links.append(single_image_link)
+        
+    LABEL_READER_PROMPT = """
+You will be provided with a set of images corresponding to a single product. These images are found printed on the packaging of the product.
+Your goal will be to extract information from these images to populate the schema provided. Here is some information you will routinely encounter. Ensure that you capture complete information, especially for nutritional information and ingredients:
+- Ingredients: List of ingredients in the item. They may have some percent listed in brackets. They may also have metadata or classification like Preservative (INS 211) where INS 211 forms the metadata. Structure accordingly. If ingredients have subingredients like sugar: added sugar, trans sugar, treat them as different ingredients.
+- Claims: Like a mango fruit juice says contains fruit.
+- Nutritional Information: This will have nutrients, serving size, and nutrients listed per serving. Extract the base value for reference.
+- FSSAI License number: Extract the license number. There might be many, so store relevant ones.
+- Name: Extract the name of the product.
+- Brand/Manufactured By: Extract the parent company of this product.
+- Serving size: This might be explicitly stated or inferred from the nutrients per serving.
+"""
+    try:
+        image_message = [{"type": "image_url", "image_url": {"url": il}} for il in valid_image_links]
+        response = await openai_client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": LABEL_READER_PROMPT},
+                        *image_message,
+                    ],
+                },
+            ],
+            response_format={"type": "json_schema", "json_schema": label_reader_schema}
+        )
+        return json.loads(response.choices[0].message.content)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error extracting information: {str(e)}")
+        
     
 @app.post("/api/extract-data")
 async def extract_data(image_links_json: Dict[str, List[str]]):
@@ -215,31 +224,6 @@ async def get_product(request: ProductRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@app.post("/upload/image/")
-async def upload_image(file: UploadFile = File(...)):
-    """Upload a single image file to S3"""
-    if not file.content_type.startswith("image/"):
-        return JSONResponse(
-            status_code=400, content={"message": "File must be an image"}
-        )
-
-    file_extension = os.path.splitext(file.filename)[1]
-    unique_filename = f"{str(uuid.uuid4())}{file_extension}"
-
-    s3_url = upload_to_s3(file.file, unique_filename)
-
-    if s3_url:
-        return {
-            "message": "Image uploaded successfully",
-            "url": s3_url,
-            "filename": unique_filename,
-        }
-    else:
-        return JSONResponse(
-            status_code=500, content={"message": "Failed to upload image"}
-        )
-
 @app.post("/upload/multiple/")
 async def upload_multiple_images(files: List[UploadFile] = File(...)):
     """Upload multiple image files to S3"""
@@ -248,6 +232,12 @@ async def upload_multiple_images(files: List[UploadFile] = File(...)):
     for file in files:
         if not file.content_type.startswith("image/"):
             continue
+
+        # Save the uploaded file temporarily
+        with NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
+            temp_file.write(file.file.read())
+            temp_path = temp_file.name
+         quality_result = check_image_quality(temp_path, blur_threshold)
 
         file_extension = os.path.splitext(file.filename)[1]
         unique_filename = f"{str(uuid.uuid4())}{file_extension}"
