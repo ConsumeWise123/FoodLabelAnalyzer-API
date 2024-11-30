@@ -8,3 +8,8 @@ uvicorn
 sentence_transformers
 pydantic
 pandas
+pyngrok
+boto3
+nest-asyncio
+python-multipart
+opencv-python-headless
